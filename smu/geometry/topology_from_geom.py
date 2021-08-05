@@ -12,10 +12,12 @@ import utilities
 
 from smu import dataset_pb2
 from smu.geometry import bond_length_distribution
+from smu.geometry import smu_molecule
+from smu.geometry import utilities
 from smu.parser import smu_utils_lib
 import smu_molecule
 
-# The longest distance considered.
+# The longest distance considered (Angstroms).
 THRESHOLD = 2.0
 
 
@@ -25,7 +27,7 @@ def hydrogen_to_nearest_atom(bond_topology: dataset_pb2.BondTopology,
       heavy atom.
   Args:
     bond_topology:
-    distances:
+    distances: natoms*natoms array of interatomic distances.
   Returns:
   """
   result = dataset_pb2.BondTopology()
@@ -71,7 +73,9 @@ def indices_of_heavy_atoms(bond_topology: dataset_pb2.BondTopology) -> List[int]
 
 def bond_topologies_from_geom(
     bond_lengths: bond_length_distribution.AllAtomPairLengthDistributions,
+    conformer_id: int,
     bond_topology: dataset_pb2.BondTopology, geometry: dataset_pb2.Geometry,
+    single_point_energy_pbe0d3_6_311gd: dataset_pb2.Properties.ScalarMolecularProperty,
     matching_parameters: smu_molecule.MatchingParameters) -> dataset_pb2.TopologyMatches:
   """Return all BondTopology's that are plausible.
 
@@ -82,15 +86,19 @@ def bond_topologies_from_geom(
       bond_length_distribution:
       bond_topology:
       geometry:
+      single_point_energy_pbe0d3_6_311gd:
     Returns:
       TopologyMatches
   """
   result = dataset_pb2.TopologyMatches()    # To be returned.
-  if len(bond_topology.atoms) == 1:
+  result.conformer_id = conformer_id
+# result.single_point_energy_pbe0d3_6_311gd.CopyFrom(single_point_energy_pbe0d3_6_311gd)
+  result.single_point_energy_pbe0d3_6_311gd = single_point_energy_pbe0d3_6_311gd.value
+  if len(bond_topology.atoms) <= 1:
     return result    # empty.
-
-  # Will be used when comparing perceived BondTopology's.
-  serialized_starting_form = bond_topology.SerializeToString()
+  # Return empty result if there is no geometry data.
+  if len(geometry.atom_positions) == 0:
+    return result
 
   utilities.canonical_bond_topology(bond_topology)
   distances = utilities.distances(geometry)
@@ -112,9 +120,7 @@ def bond_topologies_from_geom(
   # with the score for each bond type.
 
   bonds_to_scores: Dict[Tuple[int, int], np.array] = {}
-  for c in itertools.combinations(heavy_atom_indices, 2):    # All pairs.
-    i = c[0]
-    j = c[1]
+  for i, j in itertools.combinations(heavy_atom_indices, 2):    # All pairs.
     dist = distances[i, j]
     if dist > THRESHOLD:
       continue
@@ -170,5 +176,8 @@ class TopologyFromGeom(beam.DoFn):
       dataset_pb2.TopologyMatches
     """
     matching_parameters = smu_molecule.MatchingParameters()
-    yield bond_topologies_from_geom(self._bond_lengths, conformer.bond_topologies[0],
-                                    conformer.optimized_geometry, matching_parameters)
+    yield bond_topologies_from_geom(self._bond_lengths, conformer.conformer_id,
+                                    conformer.bond_topologies[0],
+                                    conformer.optimized_geometry,
+                                    conformer.properties.single_point_energy_pbe0d3_6_311gd,
+                                    matching_parameters)

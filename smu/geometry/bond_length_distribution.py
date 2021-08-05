@@ -473,7 +473,9 @@ class AllAtomPairLengthDistributions:
     if not (atom_a, atom_b) in self._atom_pair_dict.keys():
       return 0.0
 
-    if not self._atom_pair_dict[(atom_a, atom_b)].has_key(bond_type):
+    try:
+      return self._atom_pair_dict[(atom_a, atom_b)][bond_type].pdf(length)
+    except KeyError:
       return 0.0
 
     return self._atom_pair_dict[(atom_a, atom_b)][bond_type].pdf(length)

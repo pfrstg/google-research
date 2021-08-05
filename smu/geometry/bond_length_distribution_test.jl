@@ -6,9 +6,7 @@ using Test
 
 export test_single_distribution
 
-include("bond_length_distribution.jl")
-
-# using BondLengthDistributions
+using BondLengthDistributions
 
 function triangular_distribution(min_dist::Real,
                                  dist_max_value::Real,
@@ -51,7 +49,7 @@ function test_single_distribution()::Bool
 
   maxval = BondLengthDistributions.pdf(distribution, mode_point)
   @test BondLengthDistributions.pdf(distribution, 0.98 * mode_point) < maxval
-# @test BondLengthDistributions.pdf(distribution, 1.02 * mode_point) < maxval
+  @test BondLengthDistributions.pdf(distribution, 1.02 * mode_point) < maxval
   true
 end
 

@@ -6,13 +6,13 @@ import numpy as np
 
 from parameterized import parameterized, parameterized_class
 
-import unittest
+from absl.testing import absltest
 from google.protobuf import text_format
 
 from smu import dataset_pb2
 from smu.topology_from_geometry import smu_molecule
 
-class TestSMuMolecule(unittest.TestCase):
+class TestSMuMolecule(absltest.TestCase):
   """Test the SmuMolecule class."""
 
   def test_ethane(self):
@@ -131,4 +131,4 @@ class TestSMuMolecule(unittest.TestCase):
       self.assertAlmostEqual(res.score, np.product(scores))
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

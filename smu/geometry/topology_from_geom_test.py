@@ -2,7 +2,7 @@
 
 from parameterized import parameterized, parameterized_class
 from typing import Tuple
-import unittest
+from absl.testing import absltest
 
 import numpy as np
 import pandas as pd
@@ -50,7 +50,7 @@ def triangular_distribution(min_dist: float, dist_max_value: float,
   return distances, population
 
 
-class TestTopoFromGeom(unittest.TestCase):
+class TestTopoFromGeom(absltest.TestCase):
 
   def test_scores(self):
     carbon = dataset_pb2.BondTopology.AtomType.ATOM_C
@@ -99,8 +99,14 @@ atom_positions {
 
     matching_parameters = smu_molecule.MatchingParameters()
     matching_parameters.must_match_all_bonds = False
-    result = topology_from_geom.bond_topologies_from_geom(all_distributions, bond_topology,
-                                                          geometry, matching_parameters)
+    conformer_id = 3
+    energy = dataset_pb2.Properties.ScalarMolecularProperty(value=-3.14)
+    result = topology_from_geom.bond_topologies_from_geom(all_distributions, 
+                                                          conformer_id,
+                                                          bond_topology,
+                                                          geometry, 
+                                                          energy,
+                                                          matching_parameters)
     self.assertIsNotNone(result)
     self.assertEqual(len(result.bond_topology), 2)
     self.assertEqual(len(result.bond_topology[0].bonds), 1)

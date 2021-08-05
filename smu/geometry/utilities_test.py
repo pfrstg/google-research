@@ -1,6 +1,6 @@
 # Tester for SMU utilities functions.
 
-import unittest
+from absl.testing import absltest
 
 from parameterized import parameterized, parameterized_class
 
@@ -29,7 +29,7 @@ def zero2() -> dataset_pb2.Geometry:
       
 """, dataset_pb2.Geometry())
 
-class TestUtilities(unittest.TestCase):
+class TestUtilities(absltest.TestCase):
 
   def test_zero_distance(self):
     coords = zero2()
@@ -303,4 +303,4 @@ class TestUtilities(unittest.TestCase):
     self.assertEqual(utilities.is_single_fragment(bt_h), expected)
 
 if __name__ == "__main__":
-  unittest.main()
+  absltest.main()

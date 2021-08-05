@@ -41,7 +41,9 @@ mutable struct BondTopology_Bond <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -82,7 +84,9 @@ mutable struct BondTopology <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -93,7 +97,7 @@ function meta(::Type{BondTopology})
         if !isassigned(__meta_BondTopology)
             __meta_BondTopology[] = target = ProtoMeta(BondTopology)
             pack = Symbol[:atoms]
-            allflds = Pair{Symbol,Union{Type,String}}[:atoms => Base.Vector{Int32}, :bonds => Base.Vector{BondTopology_Bond}, :smiles => AbstractString, :bond_topology_id => Int32, :score => Float32, :is_starting_topology => Bool]
+            allflds = Pair{Symbol,Union{Type,String}}[:atoms => Base.Vector{Int32}, :bonds => Base.Vector{BondTopology_Bond}, :smiles => AbstractString, :bond_topology_id => Int32, :topology_probability => Float32, :goodness_of_fit => Float32, :is_starting_topology => Bool]
             meta(target, BondTopology, allflds, ProtoBuf.DEF_REQ, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, pack, ProtoBuf.DEF_WTYPES, ProtoBuf.DEF_ONEOFS, ProtoBuf.DEF_ONEOF_NAMES)
         end
         __meta_BondTopology[]
@@ -108,7 +112,9 @@ function Base.getproperty(obj::BondTopology, name::Symbol)
         return (obj.__protobuf_jl_internal_values[name])::AbstractString
     elseif name === :bond_topology_id
         return (obj.__protobuf_jl_internal_values[name])::Int32
-    elseif name === :score
+    elseif name === :topology_probability
+        return (obj.__protobuf_jl_internal_values[name])::Float32
+    elseif name === :goodness_of_fit
         return (obj.__protobuf_jl_internal_values[name])::Float32
     elseif name === :is_starting_topology
         return (obj.__protobuf_jl_internal_values[name])::Bool
@@ -130,7 +136,9 @@ mutable struct TopologyMatches <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -140,7 +148,7 @@ function meta(::Type{TopologyMatches})
     ProtoBuf.metalock() do
         if !isassigned(__meta_TopologyMatches)
             __meta_TopologyMatches[] = target = ProtoMeta(TopologyMatches)
-            allflds = Pair{Symbol,Union{Type,String}}[:bond_topology => Base.Vector{BondTopology}]
+            allflds = Pair{Symbol,Union{Type,String}}[:bond_topology => Base.Vector{BondTopology}, :conformer_id => Int32, :single_point_energy_pbe0d3_6_311gd => Float32]
             meta(target, TopologyMatches, allflds, ProtoBuf.DEF_REQ, ProtoBuf.DEF_FNUM, ProtoBuf.DEF_VAL, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES, ProtoBuf.DEF_ONEOFS, ProtoBuf.DEF_ONEOF_NAMES)
         end
         __meta_TopologyMatches[]
@@ -149,6 +157,10 @@ end
 function Base.getproperty(obj::TopologyMatches, name::Symbol)
     if name === :bond_topology
         return (obj.__protobuf_jl_internal_values[name])::Base.Vector{BondTopology}
+    elseif name === :conformer_id
+        return (obj.__protobuf_jl_internal_values[name])::Int32
+    elseif name === :single_point_energy_pbe0d3_6_311gd
+        return (obj.__protobuf_jl_internal_values[name])::Float32
     else
         getfield(obj, name)
     end
@@ -167,7 +179,9 @@ mutable struct Geometry_AtomPos <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -208,7 +222,9 @@ mutable struct Geometry <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -245,7 +261,9 @@ mutable struct Properties_Errors <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -337,7 +355,9 @@ mutable struct Properties_StringMolecularProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -374,7 +394,9 @@ mutable struct Properties_ScalarMolecularProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -411,7 +433,9 @@ mutable struct Properties_MultiScalarMolecularProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -449,7 +473,9 @@ mutable struct Properties_AtomicMolecularProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -489,7 +515,9 @@ mutable struct Properties_Vector3DMolecularProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -530,7 +558,9 @@ mutable struct Properties_VectorFrequentialProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -571,7 +601,9 @@ mutable struct Properties_AtomicVectorFrequentialProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -608,7 +640,9 @@ mutable struct Properties_Rank2MolecularProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -646,7 +680,9 @@ mutable struct Properties_Rank3MolecularProperty <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -684,7 +720,9 @@ mutable struct Properties_NormalMode_AtomicDisplacement <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -725,7 +763,9 @@ mutable struct Properties_NormalMode <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -762,7 +802,9 @@ mutable struct Properties_CalculationStatistics <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -801,7 +843,9 @@ mutable struct Properties_GaussianSanityCheck <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -856,7 +900,9 @@ mutable struct Properties <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -866,8 +912,8 @@ function meta(::Type{Properties})
     ProtoBuf.metalock() do
         if !isassigned(__meta_Properties)
             __meta_Properties[] = target = ProtoMeta(Properties)
-            fnum = Int[1,2,4,173,174,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,120,43,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,110,111,112,113,114,115,116,117,118,121,119,172]
-            allflds = Pair{Symbol,Union{Type,String}}[:errors => Properties_Errors, :geometry_gradient_norms => Properties_AtomicMolecularProperty, :harmonic_intensities => Properties_MultiScalarMolecularProperty, :harmonic_frequencies => Properties_MultiScalarMolecularProperty, :normal_modes => Base.Vector{Properties_NormalMode}, :single_point_energy_pbe0d3_6_311gd => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_mrcc => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_orca => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_cat => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_cat_mrcc => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_cat_orca => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_aug_pc_1 => Properties_ScalarMolecularProperty, :single_point_energy_hf_6_31gd => Properties_ScalarMolecularProperty, :single_point_energy_b3lyp_6_31ppgdp => Properties_ScalarMolecularProperty, :single_point_energy_b3lyp_aug_pcs_1 => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_31ppgdp => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_aug_pcs_1 => Properties_ScalarMolecularProperty, :single_point_energy_hf_tzvp => Properties_ScalarMolecularProperty, :single_point_energy_mp2_tzvp => Properties_ScalarMolecularProperty, :single_point_energy_cc2_tzvp => Properties_ScalarMolecularProperty, :single_point_energy_hf_3 => Properties_ScalarMolecularProperty, :single_point_energy_mp2_3 => Properties_ScalarMolecularProperty, :single_point_energy_hf_4 => Properties_ScalarMolecularProperty, :single_point_energy_mp2_4 => Properties_ScalarMolecularProperty, :single_point_energy_hf_34 => Properties_ScalarMolecularProperty, :single_point_energy_mp2_34 => Properties_ScalarMolecularProperty, :single_point_energy_hf_cvtz => Properties_ScalarMolecularProperty, :single_point_energy_mp2ful_cvtz => Properties_ScalarMolecularProperty, :single_point_energy_hf_2sp => Properties_ScalarMolecularProperty, :single_point_energy_mp2_2sp => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_2sp => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_t_2sp => Properties_ScalarMolecularProperty, :single_point_energy_hf_2sd => Properties_ScalarMolecularProperty, :single_point_energy_mp2_2sd => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_2sd => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_t_2sd => Properties_ScalarMolecularProperty, :single_point_energy_hf_3psd => Properties_ScalarMolecularProperty, :single_point_energy_mp2_3psd => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_3psd => Properties_ScalarMolecularProperty, :single_point_energy_atomic_b5 => Properties_ScalarMolecularProperty, :single_point_energy_atomic_b6 => Properties_ScalarMolecularProperty, :single_point_energy_eccsd => Properties_ScalarMolecularProperty, :zpe_unscaled => Properties_ScalarMolecularProperty, :homo_pbe0_6_311gd => Properties_ScalarMolecularProperty, :lumo_pbe0_6_311gd => Properties_ScalarMolecularProperty, :homo_pbe0_aug_pc_1 => Properties_ScalarMolecularProperty, :lumo_pbe0_aug_pc_1 => Properties_ScalarMolecularProperty, :homo_pbe0_6_31ppgdp => Properties_ScalarMolecularProperty, :lumo_pbe0_6_31ppgdp => Properties_ScalarMolecularProperty, :homo_pbe0_aug_pcs_1 => Properties_ScalarMolecularProperty, :lumo_pbe0_aug_pcs_1 => Properties_ScalarMolecularProperty, :homo_b3lyp_6_31ppgdp => Properties_ScalarMolecularProperty, :lumo_b3lyp_6_31ppgdp => Properties_ScalarMolecularProperty, :homo_b3lyp_aug_pcs_1 => Properties_ScalarMolecularProperty, :lumo_b3lyp_aug_pcs_1 => Properties_ScalarMolecularProperty, :homo_hf_6_31gd => Properties_ScalarMolecularProperty, :lumo_hf_6_31gd => Properties_ScalarMolecularProperty, :homo_hf_tzvp => Properties_ScalarMolecularProperty, :lumo_hf_tzvp => Properties_ScalarMolecularProperty, :homo_hf_3 => Properties_ScalarMolecularProperty, :lumo_hf_3 => Properties_ScalarMolecularProperty, :homo_hf_4 => Properties_ScalarMolecularProperty, :lumo_hf_4 => Properties_ScalarMolecularProperty, :homo_hf_cvtz => Properties_ScalarMolecularProperty, :lumo_hf_cvtz => Properties_ScalarMolecularProperty, :excitation_energies_cc2 => Properties_MultiScalarMolecularProperty, :excitation_oscillator_strengths_cc2 => Properties_MultiScalarMolecularProperty, :nmr_isotropic_shielding_pbe0_6_31ppgdp => Properties_AtomicMolecularProperty, :nmr_isotropic_shielding_pbe0_aug_pcs_1 => Properties_AtomicMolecularProperty, :nmr_isotropic_shielding_b3lyp_6_31ppgdp => Properties_AtomicMolecularProperty, :nmr_isotropic_shielding_b3lyp_aug_pcs_1 => Properties_AtomicMolecularProperty, :partial_charges_mulliken_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_mulliken_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_loewdin_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_loewdin_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_natural_nbo_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_natural_nbo_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_paboon_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_paboon_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_esp_fit_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_esp_fit_hf_6_31gd => Properties_AtomicMolecularProperty, :dipole_dipole_polarizability_pbe0_aug_pc_1 => Properties_Rank2MolecularProperty, :dipole_dipole_polarizability_hf_6_31gd => Properties_Rank2MolecularProperty, :dipole_moment_pbe0_aug_pc_1 => Properties_Vector3DMolecularProperty, :dipole_moment_hf_6_31gd => Properties_Vector3DMolecularProperty, :quadrupole_moment_pbe0_aug_pc_1 => Properties_Rank2MolecularProperty, :quadrupole_moment_hf_6_31gd => Properties_Rank2MolecularProperty, :octopole_moment_pbe0_aug_pc_1 => Properties_Rank3MolecularProperty, :octopole_moment_hf_6_31gd => Properties_Rank3MolecularProperty, :compute_cluster_info => AbstractString, :symmetry_used_in_calculation => Bool, :initial_geometry_energy => Properties_ScalarMolecularProperty, :initial_geometry_gradient_norm => Properties_ScalarMolecularProperty, :optimized_geometry_energy => Properties_ScalarMolecularProperty, :optimized_geometry_gradient_norm => Properties_ScalarMolecularProperty, :rotational_constants => Properties_Vector3DMolecularProperty, :bond_separation_reaction_left => Properties_StringMolecularProperty, :bond_separation_reaction_right => Properties_StringMolecularProperty, :bond_separation_energy_atomic_b5 => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b5_um => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b6 => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b6_um => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :bond_separation_energy_eccsd => Properties_ScalarMolecularProperty, :bond_separation_energy_eccsd_um => Properties_ScalarMolecularProperty, :bond_separation_energy_eccsd_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b5 => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b5_um => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b6 => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b6_um => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_eccsd => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_eccsd_um => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_eccsd_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b5 => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b5_um => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b6 => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b6_um => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_eccsd => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_eccsd_um => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_eccsd_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b5 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b5_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b6 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b6_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_eccsd => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_eccsd_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_eccsd_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b5 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b5_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b6 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b6_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_eccsd => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_eccsd_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_eccsd_um_ci => Properties_ScalarMolecularProperty, :zpe_atomic => Properties_ScalarMolecularProperty, :zpe_atomic_um => Properties_ScalarMolecularProperty, :zpe_atomic_um_ci => Properties_ScalarMolecularProperty, :number_imaginary_frequencies => Int32, :number_of_optimization_runs => Int32, :nuclear_repulsion_energy => Properties_ScalarMolecularProperty, :diagnostics_d1_ccsd_2sp => Properties_ScalarMolecularProperty, :diagnostics_d1_ccsd_2sd => Properties_ScalarMolecularProperty, :diagnostics_d1_ccsd_3psd => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_2sp => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_2sd => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_3psd => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_2sp_excess => Properties_ScalarMolecularProperty, :calculation_statistics => Base.Vector{Properties_CalculationStatistics}, :gaussian_sanity_check => Properties_GaussianSanityCheck]
+            fnum = Int[1,4,173,174,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,120,43,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,110,111,112,113,114,115,116,117,118,121,119,172]
+            allflds = Pair{Symbol,Union{Type,String}}[:errors => Properties_Errors, :harmonic_intensities => Properties_MultiScalarMolecularProperty, :harmonic_frequencies => Properties_MultiScalarMolecularProperty, :normal_modes => Base.Vector{Properties_NormalMode}, :single_point_energy_pbe0d3_6_311gd => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_mrcc => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_orca => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_cat => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_cat_mrcc => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_311gd_cat_orca => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_aug_pc_1 => Properties_ScalarMolecularProperty, :single_point_energy_hf_6_31gd => Properties_ScalarMolecularProperty, :single_point_energy_b3lyp_6_31ppgdp => Properties_ScalarMolecularProperty, :single_point_energy_b3lyp_aug_pcs_1 => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_6_31ppgdp => Properties_ScalarMolecularProperty, :single_point_energy_pbe0_aug_pcs_1 => Properties_ScalarMolecularProperty, :single_point_energy_hf_tzvp => Properties_ScalarMolecularProperty, :single_point_energy_mp2_tzvp => Properties_ScalarMolecularProperty, :single_point_energy_cc2_tzvp => Properties_ScalarMolecularProperty, :single_point_energy_hf_3 => Properties_ScalarMolecularProperty, :single_point_energy_mp2_3 => Properties_ScalarMolecularProperty, :single_point_energy_hf_4 => Properties_ScalarMolecularProperty, :single_point_energy_mp2_4 => Properties_ScalarMolecularProperty, :single_point_energy_hf_34 => Properties_ScalarMolecularProperty, :single_point_energy_mp2_34 => Properties_ScalarMolecularProperty, :single_point_energy_hf_cvtz => Properties_ScalarMolecularProperty, :single_point_energy_mp2ful_cvtz => Properties_ScalarMolecularProperty, :single_point_energy_hf_2sp => Properties_ScalarMolecularProperty, :single_point_energy_mp2_2sp => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_2sp => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_t_2sp => Properties_ScalarMolecularProperty, :single_point_energy_hf_2sd => Properties_ScalarMolecularProperty, :single_point_energy_mp2_2sd => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_2sd => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_t_2sd => Properties_ScalarMolecularProperty, :single_point_energy_hf_3psd => Properties_ScalarMolecularProperty, :single_point_energy_mp2_3psd => Properties_ScalarMolecularProperty, :single_point_energy_ccsd_3psd => Properties_ScalarMolecularProperty, :single_point_energy_atomic_b5 => Properties_ScalarMolecularProperty, :single_point_energy_atomic_b6 => Properties_ScalarMolecularProperty, :single_point_energy_eccsd => Properties_ScalarMolecularProperty, :zpe_unscaled => Properties_ScalarMolecularProperty, :homo_pbe0_6_311gd => Properties_ScalarMolecularProperty, :lumo_pbe0_6_311gd => Properties_ScalarMolecularProperty, :homo_pbe0_aug_pc_1 => Properties_ScalarMolecularProperty, :lumo_pbe0_aug_pc_1 => Properties_ScalarMolecularProperty, :homo_pbe0_6_31ppgdp => Properties_ScalarMolecularProperty, :lumo_pbe0_6_31ppgdp => Properties_ScalarMolecularProperty, :homo_pbe0_aug_pcs_1 => Properties_ScalarMolecularProperty, :lumo_pbe0_aug_pcs_1 => Properties_ScalarMolecularProperty, :homo_b3lyp_6_31ppgdp => Properties_ScalarMolecularProperty, :lumo_b3lyp_6_31ppgdp => Properties_ScalarMolecularProperty, :homo_b3lyp_aug_pcs_1 => Properties_ScalarMolecularProperty, :lumo_b3lyp_aug_pcs_1 => Properties_ScalarMolecularProperty, :homo_hf_6_31gd => Properties_ScalarMolecularProperty, :lumo_hf_6_31gd => Properties_ScalarMolecularProperty, :homo_hf_tzvp => Properties_ScalarMolecularProperty, :lumo_hf_tzvp => Properties_ScalarMolecularProperty, :homo_hf_3 => Properties_ScalarMolecularProperty, :lumo_hf_3 => Properties_ScalarMolecularProperty, :homo_hf_4 => Properties_ScalarMolecularProperty, :lumo_hf_4 => Properties_ScalarMolecularProperty, :homo_hf_cvtz => Properties_ScalarMolecularProperty, :lumo_hf_cvtz => Properties_ScalarMolecularProperty, :excitation_energies_cc2 => Properties_MultiScalarMolecularProperty, :excitation_oscillator_strengths_cc2 => Properties_MultiScalarMolecularProperty, :nmr_isotropic_shielding_pbe0_6_31ppgdp => Properties_AtomicMolecularProperty, :nmr_isotropic_shielding_pbe0_aug_pcs_1 => Properties_AtomicMolecularProperty, :nmr_isotropic_shielding_b3lyp_6_31ppgdp => Properties_AtomicMolecularProperty, :nmr_isotropic_shielding_b3lyp_aug_pcs_1 => Properties_AtomicMolecularProperty, :partial_charges_mulliken_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_mulliken_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_loewdin_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_loewdin_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_natural_nbo_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_natural_nbo_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_paboon_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_paboon_hf_6_31gd => Properties_AtomicMolecularProperty, :partial_charges_esp_fit_pbe0_aug_pc_1 => Properties_AtomicMolecularProperty, :partial_charges_esp_fit_hf_6_31gd => Properties_AtomicMolecularProperty, :dipole_dipole_polarizability_pbe0_aug_pc_1 => Properties_Rank2MolecularProperty, :dipole_dipole_polarizability_hf_6_31gd => Properties_Rank2MolecularProperty, :dipole_moment_pbe0_aug_pc_1 => Properties_Vector3DMolecularProperty, :dipole_moment_hf_6_31gd => Properties_Vector3DMolecularProperty, :quadrupole_moment_pbe0_aug_pc_1 => Properties_Rank2MolecularProperty, :quadrupole_moment_hf_6_31gd => Properties_Rank2MolecularProperty, :octopole_moment_pbe0_aug_pc_1 => Properties_Rank3MolecularProperty, :octopole_moment_hf_6_31gd => Properties_Rank3MolecularProperty, :compute_cluster_info => AbstractString, :symmetry_used_in_calculation => Bool, :initial_geometry_energy => Properties_ScalarMolecularProperty, :initial_geometry_gradient_norm => Properties_ScalarMolecularProperty, :optimized_geometry_energy => Properties_ScalarMolecularProperty, :optimized_geometry_gradient_norm => Properties_ScalarMolecularProperty, :rotational_constants => Properties_Vector3DMolecularProperty, :bond_separation_reaction_left => Properties_StringMolecularProperty, :bond_separation_reaction_right => Properties_StringMolecularProperty, :bond_separation_energy_atomic_b5 => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b5_um => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b6 => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b6_um => Properties_ScalarMolecularProperty, :bond_separation_energy_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :bond_separation_energy_eccsd => Properties_ScalarMolecularProperty, :bond_separation_energy_eccsd_um => Properties_ScalarMolecularProperty, :bond_separation_energy_eccsd_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b5 => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b5_um => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b6 => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b6_um => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_eccsd => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_eccsd_um => Properties_ScalarMolecularProperty, :atomization_energy_excluding_zpe_eccsd_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b5 => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b5_um => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b6 => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b6_um => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_eccsd => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_eccsd_um => Properties_ScalarMolecularProperty, :atomization_energy_including_zpe_eccsd_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b5 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b5_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b6 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b6_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_eccsd => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_eccsd_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_0k_eccsd_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b5 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b5_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b5_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b6 => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b6_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_atomic_b6_um_ci => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_eccsd => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_eccsd_um => Properties_ScalarMolecularProperty, :enthalpy_of_formation_298k_eccsd_um_ci => Properties_ScalarMolecularProperty, :zpe_atomic => Properties_ScalarMolecularProperty, :zpe_atomic_um => Properties_ScalarMolecularProperty, :zpe_atomic_um_ci => Properties_ScalarMolecularProperty, :number_imaginary_frequencies => Int32, :number_of_optimization_runs => Int32, :nuclear_repulsion_energy => Properties_ScalarMolecularProperty, :diagnostics_d1_ccsd_2sp => Properties_ScalarMolecularProperty, :diagnostics_d1_ccsd_2sd => Properties_ScalarMolecularProperty, :diagnostics_d1_ccsd_3psd => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_2sp => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_2sd => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_3psd => Properties_ScalarMolecularProperty, :diagnostics_t1_ccsd_2sp_excess => Properties_ScalarMolecularProperty, :calculation_statistics => Base.Vector{Properties_CalculationStatistics}, :gaussian_sanity_check => Properties_GaussianSanityCheck]
             meta(target, Properties, allflds, ProtoBuf.DEF_REQ, fnum, ProtoBuf.DEF_VAL, ProtoBuf.DEF_PACK, ProtoBuf.DEF_WTYPES, ProtoBuf.DEF_ONEOFS, ProtoBuf.DEF_ONEOF_NAMES)
         end
         __meta_Properties[]
@@ -876,8 +922,6 @@ end
 function Base.getproperty(obj::Properties, name::Symbol)
     if name === :errors
         return (obj.__protobuf_jl_internal_values[name])::Properties_Errors
-    elseif name === :geometry_gradient_norms
-        return (obj.__protobuf_jl_internal_values[name])::Properties_AtomicMolecularProperty
     elseif name === :harmonic_intensities
         return (obj.__protobuf_jl_internal_values[name])::Properties_MultiScalarMolecularProperty
     elseif name === :harmonic_frequencies
@@ -1223,7 +1267,9 @@ mutable struct Conformer <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -1277,7 +1323,9 @@ mutable struct MultipleConformers <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end
@@ -1314,7 +1362,9 @@ mutable struct BondTopologySummary <: ProtoType
             fldname, fldval = nv
             fldtype = symdict[fldname].jtyp
             (fldname in keys(symdict)) || error(string(typeof(obj), " has no field with name ", fldname))
-            values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            if fldval !== nothing
+                values[fldname] = isa(fldval, fldtype) ? fldval : convert(fldtype, fldval)
+            end
         end
         obj
     end

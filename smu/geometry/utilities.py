@@ -1,4 +1,4 @@
-# Utility functions for SMU
+"""Utility functions for SMU."""
 
 import math
 

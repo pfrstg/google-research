@@ -55,8 +55,8 @@ mutable struct SmuMolecule
   function SmuMolecule(hydrogens_attached::BondTopology, 
               bonds_to_scores::Dict{Tuple{Int32,Int32}, Vector{Float32}},
               matching_parameters::MatchingParameters)
-    mol = new();
-    mol.starting_bond_topology = hydrogens_attached;
+    mol = new()
+    mol.starting_bond_topology = deepcopy(hydrogens_attached)
     # Delegate processing to a separate function, keep this small.
     smu_molecule_constructor!(mol);
 
@@ -79,6 +79,7 @@ function smu_molecule_constructor!(mol::SmuMolecule)
   mol.max_bonds = zeros(Int32, natoms);
   for i in 1:natoms
     mol.max_bonds[i] = SmuUtilities.smu_atom_type_to_max_con(mol.starting_bond_topology.atoms[i])
+    @debug("Atom $(i) type $(mol.starting_bond_topology.atoms[i]) Max con $(mol.max_bonds[i])")
   end;
   # And during molecule building the current state.
   mol.current_bonds_attached = zeros(Int32, natoms);
@@ -99,11 +100,17 @@ function accumulate_score(mol::SmuMolecule, existing_score::T, increment::T)::Fl
   return mol.accumulate_score(existing_score, increment)
 end
 
+"""Reset current_bonds_attached to just hydrogens attached.
+"""
+function reset(mol::SmuMolecule)
+  mol.current_bonds_attached .= mol.bonds_with_hydrogens_attached
+end
+
 """For each pair of atoms, return a list of plausible bond types.
 
 The result will be used to enumerate all the possible bonding forms.
 The resulting Vector has the same length as mol.bonds, and each item
-in that vector is avector of the indices of the plausible bond types
+in that vector is a vector of the indices of the plausible bond types
 for that connection.
 Args:
   mol:
@@ -134,6 +141,7 @@ print(f"Trying to place bond {btype} current {self._current_bonds_attached[a1]} 
 """
 function _place_bond!(a1::Int32, a2::Int32, btype, mol::SmuMolecule)::Bool
   btype > 0 || return true
+  @debug("_place_bond $(btype) [$(mol.current_bonds_attached[a1]) $(mol.max_bonds[a1])] and [$(mol.current_bonds_attached[a2]) $(mol.max_bonds[a2])]")
   mol.current_bonds_attached[a1] + btype > mol.max_bonds[a1] && return false
   mol.current_bonds_attached[a2] + btype > mol.max_bonds[a2] && return false
 
@@ -142,18 +150,18 @@ function _place_bond!(a1::Int32, a2::Int32, btype, mol::SmuMolecule)::Bool
   return true
 end
 
-"""Place bonds corresponding to `state`.
+"""Place bonds into `mol` corresponding to `state`
 
 Args:
-  state: for each pair of atoms, the kind of bond to be placed.
+  state: for each pair of atoms in mol.bonds, the kind of bond to be placed.
 Returns:
   If successful, the score.
 """
 function place_bonds!(state::Tuple,
                       mol::SmuMolecule)::Union{dataset_pb2.BondTopology, Nothing}
-  result = dataset_pb2.BondTopology()  # To be returned.
-  copy!(result, mol.starting_bond_topology)  # Only Hydrogens attached.
+  result = deepcopy(mol.starting_bond_topology)  # Only Hydrogens attached.
   result.score = mol.initial_score
+  reset(mol)
 
   # Initialize state in mol to Hydrogens attached.
   mol.current_bonds_attached = copy(mol.bonds_with_hydrogens_attached)
@@ -161,6 +169,7 @@ function place_bonds!(state::Tuple,
   for i in 1:length(state)
     a1 = mol.bonds[i][1]
     a2 = mol.bonds[i][2]
+    @debug("placing state item $i between atoms $a1 and $a2")
     btype = state[i]
     _place_bond!(a1, a2, btype - 1, mol) || return nothing
     # If the bond is anything other than BOND_UNDEFINED, add it to result.
@@ -171,6 +180,6 @@ function place_bonds!(state::Tuple,
   # Optionally check whether all bonds have been matched
   mol.must_match_all_bonds || return result
 
-  @debug("Cf bonds $(mol.current_bonds_attached) $(mol.max_bonds)")
+  @debug("Cf bonds $(mol.current_bonds_attached) $(mol.max_bonds) result has $(length(result.bonds)) bonds")
   mol.current_bonds_attached == mol.max_bonds ? result : nothing
 end

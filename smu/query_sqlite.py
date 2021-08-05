@@ -38,6 +38,8 @@ class OutputFormat(enum.Enum):
   sdf_opt = 2
   sdf_init = 3
   sdf_init_opt = 4
+  # Protocol buffer serialized string representation.
+  proto = 5
 
 
 flags.DEFINE_string(
@@ -80,6 +82,30 @@ class PBTextOutputter:
   def close(self):
     self.outfile.close()
 
+class SerializedProtoOutputter:
+  """Simple internal class to write serialized protocol buffers to a file."""
+
+  def __init__(self, output_path):
+    """Creates SerializedProtoOutputter.
+
+    Args:
+      output_path: file path to write to
+    """
+    if output_path:
+      self.outfile = gfile.GFile(output_path, 'w')
+    else:
+      self.outfile = sys.stdout   # This will not work.
+
+  def write(self, conformer):
+    """Writes a conformer.
+
+    Args:
+      conformer: dataset_pb2.Conformer
+    """
+    self.outfile.write(conformer.SerializeToString())
+
+  def close(self):
+    self.outfile.close()
 
 class SDFOutputter:
   """Simple internal class to write entries as multi molecule SDF files."""
@@ -135,6 +161,8 @@ def main(argv):
   elif FLAGS.output_format == OutputFormat.sdf_init_opt:
     outputter = SDFOutputter(
         FLAGS.output_path, init_geometry=True, opt_geometry=True)
+  elif FLAGS.output_format == OutputFormat.proto:
+    outputter = SerializedProtoOutputter(FLAGS.output_path)
   else:
     raise ValueError(f'Bad output format {FLAGS.output_format}')
 

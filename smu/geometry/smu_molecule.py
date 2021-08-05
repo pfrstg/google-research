@@ -60,9 +60,7 @@ class SmuMolecule:
     natoms = len(hydrogens_attached.atoms)
 
     # For each atom, the maximum number of bonds that can be attached.
-    self._max_bonds = np.zeros(natoms, dtype=np.int32)
-    for i in range(0, natoms):
-      self._max_bonds[i] = smu_utils_lib.ATOM_TYPE_TO_MAX_BONDS[hydrogens_attached.atoms[i]]
+    self._max_bonds = np.array([smu_utils_lib.ATOM_TYPE_TO_MAX_BONDS[a] for a in hydrogens_attached.atoms])
 
     # With the Hydrogens attached, the number of bonds to each atom.
     self._bonds_with_hydrogens_attached = np.zeros((natoms), dtype=np.int32)
@@ -92,7 +90,7 @@ class SmuMolecule:
     self._accumualate_score = op
 
   def _initialize(self):
-    """Make the molecule reading for adding bonds between heavy atoms.
+    """Make the molecule ready for adding bonds between heavy atoms.
     """
     self._current_bonds_attached = np.copy(self._bonds_with_hydrogens_attached)
 
@@ -143,6 +141,9 @@ class SmuMolecule:
 
     Args:
       state: for each pair of atoms, the kind of bond to be placed.
+             The values in 'state` are bond types. So, the value of state[i]
+             means what kind of bond gets placed between the atoms in
+             self._bonds[i]
     Returns:
       If successful, the score.
     """
