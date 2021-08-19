@@ -102,6 +102,29 @@ message BondTopology {
 
   // A unique 1 indexed dense id for this topology.
   int32 bond_topology_id = 4;
+
+  // If this has been discerned from geometry, the associated probability of
+  // this BondTopology given the observed bond lengths in the optimized_geometry.
+  float topology_probability = 5;
+
+  // When a BondTopology is discerned from the geometry, how good a fit is
+  // that BondTopology? For example a very long bond might only possibly
+  // be a single bond, while at the same time at the very end of the observed
+  // distribution of single bonds, indicating a poor goodness of fit.
+  // Note that goodness of fit cannot readily be compared across molecules.
+  float goodness_of_fit = 6;
+
+  // If this has been discerned from geometry, is it the same as the
+  // starting BondTopology.
+  bool is_starting_topology = 7;
+}
+
+// When doing topology from geometry matching, the results are returned
+// as a set of individual BondTopology's.
+message TopologyMatches {
+  repeated BondTopology bond_topology = 1;
+  int32 conformer_id = 2;
+  float single_point_energy_pbe0d3_6_311gd = 3;
 }
 
 // Geometry captures the 3D locations of the atoms. The atom types are left

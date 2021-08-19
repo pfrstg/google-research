@@ -153,7 +153,7 @@ class EmpiricalLengthDistribution(LengthDistribution):
     self._maximum = self._df['length'].iloc[-1] + self.bucket_size
 
     self._df['pdf'] = (
-        self._df['count'] / np.sum(self._df['count']) / self.bucket_size)
+        self._df['count'] / np.sum(self._df['count'])) # IAW not sure this is right #    / self.bucket_size)
 
     self.right_tail_mass = right_tail_mass
     self._right_tail_dist = None
@@ -301,6 +301,22 @@ class AtomPairLengthDistributions:
     """Gets the Distribution for the bond_type."""
     return self._bond_type_map[bond_type]
 
+  def has_key(self, key:int) -> bool:
+    """Returns True if `key` is in self._bond_type_map.
+      Args:
+        key: a bond type
+      Returns:
+        Boolean
+    """
+    return key in self._bond_type_map.keys()
+
+  def terse_print(self, output):
+    """Quick summary to `output` to aid debugging."""
+    print("AtomPairLengthDistributions", file=output)
+    for key, value in self._bond_type_map.items():
+      print(f"  btype {key} values {value}", file=output)
+
+
   def probability_of_bond_types(
       self, length):
     """Computes probability of bond types given a length.
@@ -360,7 +376,8 @@ class AllAtomPairLengthDistributions:
     self._atom_pair_dict[(atom_a, atom_b)].add(bond_type, dist)
 
   def add_from_files(self, filestem,
-                     unbonded_right_tail_mass):
+                     unbonded_right_tail_mass,
+                     include_nonbonded=True):
     """Adds distributions from a set of files.
 
     Files are expected to be named {filestem}.{atom_a}.{bond_type}.{atom_b}
@@ -376,6 +393,7 @@ class AllAtomPairLengthDistributions:
       filestem: prefix of files to load
       unbonded_right_tail_mass: right_tail_mass (as described in
         EmpiricalLengthDistribution) for the unbonded cases.
+      include_nonbonded: whether or not to include non-bonded data.
     """
     atom_types = [
         dataset_pb2.BondTopology.ATOM_H,
@@ -385,12 +403,19 @@ class AllAtomPairLengthDistributions:
         dataset_pb2.BondTopology.ATOM_F,
     ]
 
-    bond_types = [
-        dataset_pb2.BondTopology.BOND_UNDEFINED,
-        dataset_pb2.BondTopology.BOND_SINGLE,
-        dataset_pb2.BondTopology.BOND_DOUBLE,
-        dataset_pb2.BondTopology.BOND_TRIPLE,
-    ]
+    if include_nonbonded:
+      bond_types = [
+          dataset_pb2.BondTopology.BOND_UNDEFINED,
+          dataset_pb2.BondTopology.BOND_SINGLE,
+          dataset_pb2.BondTopology.BOND_DOUBLE,
+          dataset_pb2.BondTopology.BOND_TRIPLE,
+      ]
+    else:
+      bond_types = [
+          dataset_pb2.BondTopology.BOND_SINGLE,
+          dataset_pb2.BondTopology.BOND_DOUBLE,
+          dataset_pb2.BondTopology.BOND_TRIPLE,
+      ]
 
     for (atom_a, atom_b), bond_type in itertools.product(
         itertools.combinations_with_replacement(atom_types, 2), bond_types):
@@ -442,11 +467,26 @@ class AllAtomPairLengthDistributions:
           EmpiricalLengthDistribution.from_sparse_dataframe(
               df, right_tail_mass, sig_digits))
 
+  def terse_print(self, output):
+    """Print terse details of the distribution to `output`."""
+    print("AllAtomPairLengthDistributions", file=output)
+    for key, value in self._atom_pair_dict.items():
+      print(f"  types {key}", file=output)
+      value.terse_print(output)
+
   def pdf_length_given_type(self, atom_a,
                             atom_b,
                             bond_type,
                             length):
     """p(length | atom_a, atom_b, bond_type)."""
+    if not (atom_a, atom_b) in self._atom_pair_dict.keys():
+      return 0.0
+
+    try:
+      return self._atom_pair_dict[(atom_a, atom_b)][bond_type].pdf(length)
+    except KeyError:
+      return 0.0
+
     return self._atom_pair_dict[(atom_a, atom_b)][bond_type].pdf(length)
 
   def probability_of_bond_types(
