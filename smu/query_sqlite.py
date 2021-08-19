@@ -50,7 +50,7 @@ flags.DEFINE_string(
     'Path to output file to write. If not specified, will write to stdout.')
 flags.DEFINE_list('btids', [], 'List of bond topology ids to query')
 flags.DEFINE_list('cids', [], 'List of conformer ids to query')
-flags.DEFINE_list('smiles', [], 'List of smiles to query')
+flags.DEFINE_multi_string('smiles', [], 'List of smiles to query')
 flags.DEFINE_enum_class('output_format', OutputFormat.pbtxt, OutputFormat,
                         'Format for the found SMU entries')
 

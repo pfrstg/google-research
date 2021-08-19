@@ -155,7 +155,7 @@ class EmpiricalLengthDistribution(LengthDistribution):
     self._maximum = self._df['length'].iloc[-1] + self.bucket_size
 
     self._df['pdf'] = (
-        self._df['count'] / np.sum(self._df['count']) / self.bucket_size)
+        self._df['count'] / np.sum(self._df['count'])) # IAW not sure this is right #    / self.bucket_size)
 
     self.right_tail_mass = right_tail_mass
     self._right_tail_dist = None
@@ -316,6 +316,13 @@ class AtomPairLengthDistributions:
     """
     return key in self._bond_type_map.keys()
 
+  def terse_print(self, output):
+    """Quick summary to `output` to aid debugging."""
+    print("AtomPairLengthDistributions", file=output)
+    for key, value in self._bond_type_map.items():
+      print(f"  btype {key} values {value}", file=output)
+
+
   def probability_of_bond_types(
       self, length):
     """Computes probability of bond types given a length.
@@ -464,6 +471,13 @@ class AllAtomPairLengthDistributions:
                EmpiricalLengthDistribution.from_sparse_dataframe(
                  df, right_tail_mass, sig_digits))
     pass
+
+  def terse_print(self, output):
+    """Print terse details of the distribution to `output`."""
+    print("AllAtomPairLengthDistributions", file=output)
+    for key, value in self._atom_pair_dict.items():
+      print(f"  types {key}", file=output)
+      value.terse_print(output)
 
   def pdf_length_given_type(self, atom_a,
                             atom_b,

@@ -151,7 +151,7 @@ class SmuMolecule:
 
     result = dataset_pb2.BondTopology()
     result.CopyFrom(self._starting_bond_topology)    # only Hydrogens attached.
-    result.score = self._initial_score
+    result.goodness_of_fit = self._initial_score
 
     for i, btype in enumerate(state):
       a1 = self._bonds[i][0]
@@ -159,7 +159,7 @@ class SmuMolecule:
       if not self._place_bond(a1, a2, btype):
         return None
 
-      result.score = self._accumualate_score(result.score, self._scores[i][btype])
+      result.goodness_of_fit = self._accumualate_score(result.goodness_of_fit, self._scores[i][btype])
       if btype:
         add_bond(a1, a2, btype, result)
 

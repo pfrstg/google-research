@@ -35,7 +35,7 @@ def topology_matches_summary(topology_matches:dataset_pb2.TopologyMatches) -> st
   result = f"{topology_matches.conformer_id},{len(topology_matches.bond_topology)},{energy}"
 
   for bt in topology_matches.bond_topology:
-    result += f",{bt.score:.3f},{bt.smiles}"
+    result += f",{bt.goodness_of_fit:.3f},{bt.smiles}"
     if bt.is_starting_topology:
       result += ",T"
     else:

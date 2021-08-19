@@ -89,6 +89,14 @@ BOND_TYPE_TO_RDKIT = {
     dataset_pb2.BondTopology.BondType.BOND_TRIPLE: Chem.rdchem.BondType.TRIPLE,
 }
 
+# Not really necessary since these are the same numbers as used in the proto.
+BOND_TYPE_TO_INTEGER = {
+  dataset_pb2.BondTopology.BondType.BOND_UNDEFINED: 0,
+  dataset_pb2.BondTopology.BondType.BOND_SINGLE: 1,
+  dataset_pb2.BondTopology.BondType.BOND_DOUBLE: 2,
+  dataset_pb2.BondTopology.BondType.BOND_TRIPLE: 3,
+}
+
 INTEGER_TO_BOND_TYPE = [
   dataset_pb2.BondTopology.BondType.BOND_UNDEFINED,
   dataset_pb2.BondTopology.BondType.BOND_SINGLE,

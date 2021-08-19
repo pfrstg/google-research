@@ -25,6 +25,8 @@ def hydrogen_to_nearest_atom(bond_topology: dataset_pb2.BondTopology,
                              distances: np.array) -> Optional[dataset_pb2.BondTopology]:
   """Generate a BondTopology that joins each Hydrogen atom to its nearest
       heavy atom.
+    Note that if we detect an H atom that cannot be attached to a heavy
+    atom, we return None.
   Args:
     bond_topology:
     distances: natoms*natoms array of interatomic distances.
@@ -70,6 +72,30 @@ def indices_of_heavy_atoms(bond_topology: dataset_pb2.BondTopology) -> List[int]
       i for i, t in enumerate(bond_topology.atoms) if t != dataset_pb2.BondTopology.AtomType.ATOM_H
   ]
 
+def report_atoms_too_close(distances:np.array, cutoff, bt:dataset_pb2.BondTopology):
+  """Report atom pairs in `distances` closer than `cutoff`.
+  Args:
+    distances: pairwise distances between the atoms in `bt`.
+    cutoff: report distances closer than `cutoff`.
+    bt: BondTopology
+  """
+  print("Atoms too close")
+  natoms = np.shape(distances)[0]
+  for i in range(0,natoms):
+    for j in range(i + 1,natoms):
+      if distances[i, j] < cutoff:
+        s1 = smu_utils_lib.ATOM_TYPE_TO_RDKIT[bt.atoms[i]]
+        s2 = smu_utils_lib.ATOM_TYPE_TO_RDKIT[bt.atoms[j]]
+        print(f"  too short {s1} {s2} {distances[i,j]}")
+
+def atoms_too_close(distances:np.array, cutoff) -> bool:
+  """Return true if any values in `distances` are less than `cutoff`.
+  The diagonals are all zero, so will be < cutoff, so if there are
+  more than the size of `distances` less than cutoff, those must be
+  off diagonals.
+  """
+  return np.sum(np.less(distances, cutoff)) > np.shape(distances)[0]
+
 
 def bond_topologies_from_geom(
     bond_lengths: bond_length_distribution.AllAtomPairLengthDistributions,
@@ -92,16 +118,18 @@ def bond_topologies_from_geom(
   """
   result = dataset_pb2.TopologyMatches()    # To be returned.
   result.conformer_id = conformer_id
-# result.single_point_energy_pbe0d3_6_311gd.CopyFrom(single_point_energy_pbe0d3_6_311gd)
   result.single_point_energy_pbe0d3_6_311gd = single_point_energy_pbe0d3_6_311gd.value
   if len(bond_topology.atoms) <= 1:
     return result    # empty.
-  # Return empty result if there is no geometry data.
+  # Return empty result if there is no geometry data. Should not happen.
   if len(geometry.atom_positions) == 0:
     return result
 
   utilities.canonical_bond_topology(bond_topology)
   distances = utilities.distances(geometry)
+  if atoms_too_close(distances, 0.90):
+    report_atoms_too_close(distances, 0.90, bond_topology)
+    return result
 
   # First join each Hydrogen to its nearest heavy atom, thereby
   # creating a starting BondTopology from which all others can grow
@@ -126,7 +154,6 @@ def bond_topologies_from_geom(
       continue
     btypes = np.zeros(4, np.float32)
     for btype in range(0, 4):
-      #    print(f"Looking for pdfs of {bond_topology.atoms[i]} {bond_topology.atoms[j]} type {btype} dist {dist}")
       btypes[btype] = bond_lengths.pdf_length_given_type(bond_topology.atoms[i],
                                                          bond_topology.atoms[j], btype, dist)
 
@@ -136,7 +163,6 @@ def bond_topologies_from_geom(
   if not bonds_to_scores:    # Seems unlikely.
     return result
 
-# print(f"Mol with {len(bond_topology.atoms)} has {bonds_to_scores}")
   mol = smu_molecule.SmuMolecule(starting_bond_topology, bonds_to_scores, matching_parameters)
 
   search_space = mol.generate_search_state()
@@ -145,19 +171,42 @@ def bond_topologies_from_geom(
     if not bt:
       continue
 
-      continue
     utilities.canonical_bond_topology(bt)
     if utilities.same_bond_topology(bond_topology, bt):
       bt.is_starting_topology = True
     bt.smiles = smu_utils_lib.compute_smiles_for_bond_topology(bt,
                                                                include_hs=True,
                                                                labeled_atoms=True)
+    compute_probability(bt, bond_lengths, distances)
     result.bond_topology.append(bt)
 
   if len(result.bond_topology) > 1:
-    result.bond_topology.sort(key=lambda bt: bt.score, reverse=True)
+    result.bond_topology.sort(key=lambda bt: bt.goodness_of_fit, reverse=True)
 
   return result
+
+def compute_probability(bt: dataset_pb2.BondTopology,
+                        bond_lengths: bond_length_distribution.AllAtomPairLengthDistributions,
+                        distances: np.array):
+  """Set the topology_probability attribute in `bt` based on the bonding
+  pattern in `bt`.
+  Args:
+    bt:
+    bond_lengths: bond length distributions
+    distances: matrix of interatomic distances
+  """
+  result = 1.0
+  for bond in bt.bonds:
+    at1 = bt.atoms[bond.atom_a]
+    at2 = bt.atoms[bond.atom_b]
+
+    pdfs = bond_lengths.probability_of_bond_types(at1, at2, distances[bond.atom_a, bond.atom_b])
+    if bond.bond_type in pdfs:
+      result *= pdfs[bond.bond_type]
+    else:
+      result = 0.0
+
+  bt.topology_probability = result
 
 
 class TopologyFromGeom(beam.DoFn):

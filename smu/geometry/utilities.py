@@ -17,7 +17,7 @@ DISTANCE_BINS = 10000
 
 
 def distance_between_atoms(geom: dataset_pb2.Geometry, a1: int, a2: int) -> float:
-  """Return the distance between atoms `a1` and `a2` in `geom`.
+  """Return the distance in Angstroms between atoms `a1` and `a2` in `geom`.
   Args:
     geom:
     a1:
@@ -244,3 +244,20 @@ def is_single_fragment(bond_topology: dataset_pb2.BondTopology) -> bool:
 
   number_visited = np.count_nonzero(visited) + visit(attached, a_multiply_connected_atom, visited)
   return number_visited == natoms
+
+def geom_to_angstroms(geometry:dataset_pb2.Geometry) -> dataset_pb2.Geometry:
+  """Convert all the coordinates in `geometry` to Angstroms
+  Args:
+    geometry: starting Geometry
+  Returns
+    New Geometry with adjusted coordinates.
+  """
+  result = dataset_pb2.Geometry()
+  for atom in geometry.atom_positions:
+    new_atom = dataset_pb2.Geometry.AtomPos()
+    new_atom.x = smu_utils_lib.bohr_to_angstroms(atom.x)
+    new_atom.y = smu_utils_lib.bohr_to_angstroms(atom.y)
+    new_atom.z = smu_utils_lib.bohr_to_angstroms(atom.z)
+    result.atom_positions.append(new_atom)
+
+  return result
