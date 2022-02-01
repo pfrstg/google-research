@@ -280,6 +280,12 @@ class PBTextOutputter:
       self.outfile = open(output_path, 'w')
     else:
       self.outfile = sys.stdout
+    print(
+      '# proto-file: third_party/google_research/google_research/smu/dataset.proto',
+      file=self.outfile)
+    print(
+      '# proto-message: MultipleConformers',
+      file=self.outfile)
 
   def output(self, conformer):
     """Writes a conformer.
@@ -287,7 +293,14 @@ class PBTextOutputter:
     Args:
       conformer: dataset_pb2.Conformer
     """
+    # This is kind of a hack. We manually write the conformers { }
+    # formatting expected by MultipleConformers rather than actually using a
+    # MultipleConformers message.
+    print(
+      'conformers {',
+      file=self.outfile)
     self.outfile.write(str(conformer))
+    print('}', file=self.outfile)
 
   def close(self):
     self.outfile.close()
